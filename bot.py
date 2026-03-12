@@ -57,19 +57,21 @@ Return ONLY a JSON array of dish names.
 
 Message: "{message}"
 """
-    try:
-        response = openai.ChatCompletion.create(
+   try:
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             temperature=0.2,
-            messages=[{"role": "user", "content": prompt}]
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
         )
-        # Check if the response was received correctly and parse it
+
         dishes = json.loads(response.choices[0].message.content)
         return dishes
+
     except Exception as e:
-        # Catch the error and print it
-        print(f"Error in dish detection: {str(e)}")
-        return [] 
+        print("Error in dish detection:", e)
+        return []
 # ===============================
 # WINE RECOMMENDATION
 # ===============================
