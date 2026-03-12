@@ -54,12 +54,13 @@ Message: "{message}"
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
         )
+        # Check if the response was received correctly and parse it
         dishes = json.loads(response.choices[0].message.content)
         return dishes
     except Exception as e:
-        print("Dish detection error:", e)
-        return []
-
+        # Catch the error and print it
+        print(f"Error in dish detection: {str(e)}")
+        return [] 
 # ===============================
 # WINE RECOMMENDATION
 # ===============================
