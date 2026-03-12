@@ -9,9 +9,11 @@ from flask_cors import CORS
 # ===============================
 # CONFIG
 # ===============================
+# Securely get your API key from environment variables
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-app = Flask(__name__, template_folder="templates")  # HTML in templates/
+# Initialize Flask app
+app = Flask(__name__, template_folder="templates")
 CORS(app)  # Allow AJAX calls from front-end
 
 # ===============================
@@ -35,7 +37,7 @@ local_dish_synonyms = {
 }
 
 # ===============================
-# DISH DETECTION WITH GPT
+# DISH DETECTION
 # ===============================
 def detect_dish_with_gpt(message: str):
     # Replace local slang with standard dish names
@@ -56,11 +58,8 @@ Message: "{message}"
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
         )
-
         dishes = json.loads(response.choices[0].message.content)
-        print("Detected dishes:", dishes)
         return dishes
-
     except Exception as e:
         print("Error in dish detection:", e)
         return []
@@ -122,7 +121,7 @@ Return a JSON array like this:
         return []
 
 # ===============================
-# HEALTH CHECK / HTML UI
+# HEALTH CHECK
 # ===============================
 @app.route("/health")
 def health():
@@ -161,17 +160,6 @@ def whatsapp():
     return str(resp)
 
 # ===============================
-# WEBHOOK TEST
-# ===============================
-@app.route("/webhook", methods=["GET","POST"])
-def webhook():
-    if request.method == "GET":
-        return "Webhook working", 200
-    data = request.json
-    print("Incoming message:", data)
-    return jsonify({"status": "ok"})
-
-# ===============================
 # CHAT UI AJAX
 # ===============================
 @app.route("/chat", methods=["POST"])
@@ -195,6 +183,17 @@ def chat():
         reply = "Tell me what South African dish you're eating."
 
     return jsonify({"reply": reply})
+
+# ===============================
+# WEBHOOK TEST
+# ===============================
+@app.route("/webhook", methods=["GET","POST"])
+def webhook():
+    if request.method == "GET":
+        return "Webhook working", 200
+    data = request.json
+    print("Incoming message:", data)
+    return jsonify({"status": "ok"})
 
 # ===============================
 # RUN
