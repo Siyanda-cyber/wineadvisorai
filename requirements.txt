@@ -1,5 +1,5 @@
 Flask
-Flask-CORS==3.1.2
+Flask-CORS
 pandas
 openai
 twilio
