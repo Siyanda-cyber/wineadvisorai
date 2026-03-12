@@ -11,20 +11,14 @@ from flask_cors import CORS
 # ===============================
 client = OpenAI(api_key=os.getenv("sk-...wHEA"))
 
-def test_openai():
-    try:
-       response = client.chat.completions.create(
+response = client.chat.completions.create(
     model="gpt-4o-mini",
     temperature=0.2,
     messages=[
         {"role": "user", "content": prompt}
     ]
 )
-
 dishes = json.loads(response.choices[0].message.content)
-
-# Test OpenAI API call locally (if you're running locally) or remotely.
-test_openai()
 
 app = Flask(__name__, template_folder="templates")  # HTML in templates/
 CORS(app)  # Allow AJAX calls from front-end
