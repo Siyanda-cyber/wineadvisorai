@@ -3,24 +3,25 @@ import json
 import pandas as pd
 from flask import Flask, request, render_template, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
-import openai
+from openai import OpenAI
 from flask_cors import CORS
 
 # ===============================
 # CONFIG
 # ===============================
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("sk-...wHEA"))
 
 def test_openai():
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",  # Use the correct model you need
-            prompt="Say something funny.",
-            max_tokens=50
-        )
-        print(response.choices[0].text.strip())
-    except Exception as e:
-        print("OpenAI API error:", e)
+       response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    temperature=0.2,
+    messages=[
+        {"role": "user", "content": prompt}
+    ]
+)
+
+dishes = json.loads(response.choices[0].message.content)
 
 # Test OpenAI API call locally (if you're running locally) or remotely.
 test_openai()
