@@ -34,7 +34,7 @@ async function sendMessage() {
   chat.scrollTop = chat.scrollHeight;
 
   try {
-    const response = await fetch("https://winegoofy.onrender.com/chat", {
+    const response = await fetch("https://wineadvisorai.onrender.com/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message })
