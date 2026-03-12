@@ -47,6 +47,7 @@ local_dish_synonyms = {
 # DISH DETECTION WITH GPT
 # ===============================
 def detect_dish_with_gpt(message: str):
+
     for slang, real in local_dish_synonyms.items():
         message = message.replace(slang, real)
 
@@ -57,7 +58,8 @@ Return ONLY a JSON array of dish names.
 
 Message: "{message}"
 """
-   try:
+
+    try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             temperature=0.2,
@@ -67,6 +69,8 @@ Message: "{message}"
         )
 
         dishes = json.loads(response.choices[0].message.content)
+        print("Detected dishes:", dishes)
+
         return dishes
 
     except Exception as e:
