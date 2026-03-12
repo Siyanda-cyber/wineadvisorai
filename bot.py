@@ -9,7 +9,7 @@ from flask_cors import CORS
 # ===============================
 # CONFIG
 # ===============================
-client = OpenAI(api_key=os.getenv("sk-...wHEA"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__, template_folder="templates")  # HTML in templates/
 CORS(app)  # Allow AJAX calls from front-end
