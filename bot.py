@@ -131,9 +131,9 @@ Return JSON like this:
 # ===============================
 # HEALTH CHECK / HTML UI
 # ===============================
-@app.route("/")
-def home():
-    return render_template("index.html")
+@app.route("/health")
+def health():
+    return "OK"
 
 # ===============================
 # WHATSAPP BOT
