@@ -11,6 +11,20 @@ from flask_cors import CORS
 # ===============================
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def test_openai():
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",  # Use the correct model you need
+            prompt="Say something funny.",
+            max_tokens=50
+        )
+        print(response.choices[0].text.strip())
+    except Exception as e:
+        print("OpenAI API error:", e)
+
+# Test OpenAI API call locally (if you're running locally) or remotely.
+test_openai()
+
 app = Flask(__name__, template_folder="templates")  # HTML in templates/
 CORS(app)  # Allow AJAX calls from front-end
 
