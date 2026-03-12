@@ -1,0 +1,182 @@
+import os
+import json
+import pandas as pd
+from flask import Flask, request, render_template, jsonify
+from twilio.twiml.messaging_response import MessagingResponse
+import openai
+
+# ===============================
+# CONFIG
+# ===============================
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+app = Flask(__name__, template_folder="templates")  # ensure your HTML is in 'templates/'
+
+# ===============================
+# HEALTH CHECK / HTML UI
+# ===============================
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+# ===============================
+# LOAD DATA
+# ===============================
+foods = pd.read_csv("foods.csv")
+
+with open("Pairing_rules.json") as f:
+    rules = json.load(f)
+
+# ===============================
+# LOCAL DISH SLANG
+# ===============================
+local_dish_synonyms = {
+    "vetkoek": "amagwinya",
+    "braai meat": "boerewors",
+    "kota": "kota",
+    "umngqusho": "umngqusho",
+    "pap": "pap",
+    "chakalaka": "pap & chakalaka"
+}
+
+# ===============================
+# DISH DETECTION WITH GPT
+# ===============================
+def detect_dish_with_gpt(message):
+    for slang, real in local_dish_synonyms.items():
+        message = message.replace(slang, real)
+
+    prompt = f"""
+You are a South African food expert.
+Identify all South African dishes mentioned in the user's message.
+Return ONLY a JSON array of dish names.
+
+Message: "{message}"
+"""
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            temperature=0.2,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        dishes = json.loads(response.choices[0].message.content)
+        return dishes
+    except Exception as e:
+        print("Dish detection error:", e)
+        return []
+
+# ===============================
+# WINE RECOMMENDATION
+# ===============================
+def recommend_wine_with_gpt(dishes):
+    dish_info = []
+
+    for dish in dishes:
+        row = foods[foods["dish_name"].str.lower() == dish.lower()]
+        if not row.empty:
+            row = row.iloc[0]
+            dish_info.append({
+                "dish": dish,
+                "flavor": row["flavor_profile"],
+                "fat": row["fat_level"],
+                "spice": row["spice_level"],
+                "method": row["cooking_method"],
+                "protein": row["protein"]
+            })
+
+    prompt = f"""
+You are a professional South African wine sommelier.
+The user is eating these dishes: {dish_info}
+Recommend wines from the Western Cape (Stellenbosch, Paarl, Franschhoek, Constantia).
+Suggest 3 wines per dish.
+Return JSON like this:
+[
+ {{
+  "dish": "dish name",
+  "wines": [
+   {{
+    "name": "Wine name",
+    "grape": "grape variety",
+    "region": "region",
+    "reason": "short pairing explanation"
+   }}
+  ]
+ }}
+]
+"""
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            temperature=0.4,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return json.loads(response.choices[0].message.content)
+    except Exception as e:
+        print("Wine recommendation error:", e)
+        return []
+
+# ===============================
+# WHATSAPP BOT
+# ===============================
+@app.route("/whatsapp", methods=["POST"])
+def whatsapp():
+    incoming_msg = request.values.get("Body", "").lower()
+    resp = MessagingResponse()
+    msg = resp.message()
+
+    dishes = detect_dish_with_gpt(incoming_msg)
+
+    if dishes:
+        recommendations = recommend_wine_with_gpt(dishes)
+        reply = "🍷 Wine Recommendations\n\n"
+        for rec in recommendations:
+            reply += f"{rec['dish'].title()}\n"
+            for wine in rec["wines"]:
+                reply += (
+                    f"• {wine['name']} ({wine['grape']} – {wine['region']})\n"
+                    f"{wine['reason']}\n"
+                )
+            reply += "\n"
+    else:
+        reply = (
+            "Hi! I'm your Wine Advisor 🍷\n\n"
+            "Tell me what you're eating and I'll recommend a Western Cape wine.\n\n"
+            "Examples:\n• boerewors\n• mogodu\n• bobotie\n• braai meat"
+        )
+
+    msg.body(reply)
+    return str(resp)
+
+# ===============================
+# WEBHOOK TEST
+# ===============================
+@app.route("/webhook", methods=["GET","POST"])
+def webhook():
+    if request.method == "GET":
+        return "Webhook working", 200
+    data = request.json
+    print("Incoming message:", data)
+    return jsonify({"status": "ok"})
+
+# ===============================
+# CHAT UI AJAX
+# ===============================
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.json
+    message = data.get("message", "")
+
+    dishes = detect_dish_with_gpt(message)
+
+    if dishes:
+        recommendations = recommend_wine_with_gpt(dishes)
+        reply = ""
+        for rec in recommendations:
+            reply += f"\n🍷 {rec['dish'].title()}\n"
+            for wine in rec["wines"]:
+                reply += f"- {wine['name']} ({wine['grape']} – {wine['region']})\n"
+                reply += f"{wine['reason']}\n"
+    else:
+        reply = "Tell me what South African dish you're eating."
+
+    return jsonify({"reply": reply})
