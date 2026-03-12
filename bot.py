@@ -4,20 +4,15 @@ import pandas as pd
 from flask import Flask, request, render_template, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import openai
+from flask_cors import CORS
 
 # ===============================
 # CONFIG
 # ===============================
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-app = Flask(__name__, template_folder="templates")  # ensure your HTML is in 'templates/'
-
-# ===============================
-# HEALTH CHECK / HTML UI
-# ===============================
-@app.route("/")
-def home():
-    return render_template("index.html")
+app = Flask(__name__, template_folder="templates")  # HTML in templates/
+CORS(app)  # Allow AJAX calls from front-end
 
 # ===============================
 # LOAD DATA
@@ -42,7 +37,7 @@ local_dish_synonyms = {
 # ===============================
 # DISH DETECTION WITH GPT
 # ===============================
-def detect_dish_with_gpt(message):
+def detect_dish_with_gpt(message: str):
     for slang, real in local_dish_synonyms.items():
         message = message.replace(slang, real)
 
@@ -68,7 +63,7 @@ Message: "{message}"
 # ===============================
 # WINE RECOMMENDATION
 # ===============================
-def recommend_wine_with_gpt(dishes):
+def recommend_wine_with_gpt(dishes: list):
     dish_info = []
 
     for dish in dishes:
@@ -83,6 +78,9 @@ def recommend_wine_with_gpt(dishes):
                 "method": row["cooking_method"],
                 "protein": row["protein"]
             })
+
+    if not dish_info:
+        return []
 
     prompt = f"""
 You are a professional South African wine sommelier.
@@ -116,6 +114,13 @@ Return JSON like this:
         return []
 
 # ===============================
+# HEALTH CHECK / HTML UI
+# ===============================
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+# ===============================
 # WHATSAPP BOT
 # ===============================
 @app.route("/whatsapp", methods=["POST"])
@@ -128,15 +133,18 @@ def whatsapp():
 
     if dishes:
         recommendations = recommend_wine_with_gpt(dishes)
-        reply = "🍷 Wine Recommendations\n\n"
-        for rec in recommendations:
-            reply += f"{rec['dish'].title()}\n"
-            for wine in rec["wines"]:
-                reply += (
-                    f"• {wine['name']} ({wine['grape']} – {wine['region']})\n"
-                    f"{wine['reason']}\n"
-                )
-            reply += "\n"
+        if recommendations:
+            reply = "🍷 Wine Recommendations\n\n"
+            for rec in recommendations:
+                reply += f"{rec['dish'].title()}\n"
+                for wine in rec["wines"]:
+                    reply += (
+                        f"• {wine['name']} ({wine['grape']} – {wine['region']})\n"
+                        f"{wine['reason']}\n"
+                    )
+                reply += "\n"
+        else:
+            reply = "Sorry, no wine recommendations found for your dish."
     else:
         reply = (
             "Hi! I'm your Wine Advisor 🍷\n\n"
@@ -167,16 +175,26 @@ def chat():
     message = data.get("message", "")
 
     dishes = detect_dish_with_gpt(message)
+    reply = ""
 
     if dishes:
         recommendations = recommend_wine_with_gpt(dishes)
-        reply = ""
-        for rec in recommendations:
-            reply += f"\n🍷 {rec['dish'].title()}\n"
-            for wine in rec["wines"]:
-                reply += f"- {wine['name']} ({wine['grape']} – {wine['region']})\n"
-                reply += f"{wine['reason']}\n"
+        if recommendations:
+            for rec in recommendations:
+                reply += f"\n🍷 {rec['dish'].title()}\n"
+                for wine in rec["wines"]:
+                    reply += f"- {wine['name']} ({wine['grape']} – {wine['region']})\n"
+                    reply += f"{wine['reason']}\n"
+        else:
+            reply = "No wine recommendations found for your dish."
     else:
         reply = "Tell me what South African dish you're eating."
 
     return jsonify({"reply": reply})
+
+# ===============================
+# RUN
+# ===============================
+if __name__ == "__main__":
+    # Only for local testing; Render uses gunicorn
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
