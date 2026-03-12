@@ -11,15 +11,6 @@ from flask_cors import CORS
 # ===============================
 client = OpenAI(api_key=os.getenv("sk-...wHEA"))
 
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    temperature=0.2,
-    messages=[
-        {"role": "user", "content": prompt}
-    ]
-)
-dishes = json.loads(response.choices[0].message.content)
-
 app = Flask(__name__, template_folder="templates")  # HTML in templates/
 CORS(app)  # Allow AJAX calls from front-end
 
@@ -47,7 +38,7 @@ local_dish_synonyms = {
 # DISH DETECTION WITH GPT
 # ===============================
 def detect_dish_with_gpt(message: str):
-
+    # Replace local slang with standard dish names
     for slang, real in local_dish_synonyms.items():
         message = message.replace(slang, real)
 
@@ -63,25 +54,24 @@ Message: "{message}"
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             temperature=0.2,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            messages=[{"role": "user", "content": prompt}]
         )
 
         dishes = json.loads(response.choices[0].message.content)
         print("Detected dishes:", dishes)
-
         return dishes
 
     except Exception as e:
         print("Error in dish detection:", e)
         return []
+
 # ===============================
 # WINE RECOMMENDATION
 # ===============================
 def recommend_wine_with_gpt(dishes: list):
     dish_info = []
 
+    # Build structured info for GPT to pair
     for dish in dishes:
         row = foods[foods["dish_name"].str.lower() == dish.lower()]
         if not row.empty:
@@ -101,9 +91,9 @@ def recommend_wine_with_gpt(dishes: list):
     prompt = f"""
 You are a professional South African wine sommelier.
 The user is eating these dishes: {dish_info}
-Recommend wines from the Western Cape (Stellenbosch, Paarl, Franschhoek, Constantia).
-Suggest 3 wines per dish.
-Return JSON like this:
+Recommend 3 wines per dish from the Western Cape (Stellenbosch, Paarl, Franschhoek, Constantia).
+Return a JSON array like this:
+
 [
  {{
   "dish": "dish name",
@@ -118,13 +108,15 @@ Return JSON like this:
  }}
 ]
 """
+
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             temperature=0.4,
             messages=[{"role": "user", "content": prompt}]
         )
-        return json.loads(response.choices[0].message.content)
+        wines = json.loads(response.choices[0].message.content)
+        return wines
     except Exception as e:
         print("Wine recommendation error:", e)
         return []
@@ -154,10 +146,7 @@ def whatsapp():
             for rec in recommendations:
                 reply += f"{rec['dish'].title()}\n"
                 for wine in rec["wines"]:
-                    reply += (
-                        f"• {wine['name']} ({wine['grape']} – {wine['region']})\n"
-                        f"{wine['reason']}\n"
-                    )
+                    reply += f"• {wine['name']} ({wine['grape']} – {wine['region']})\n{wine['reason']}\n"
                 reply += "\n"
         else:
             reply = "Sorry, no wine recommendations found for your dish."
@@ -199,8 +188,7 @@ def chat():
             for rec in recommendations:
                 reply += f"\n🍷 {rec['dish'].title()}\n"
                 for wine in rec["wines"]:
-                    reply += f"- {wine['name']} ({wine['grape']} – {wine['region']})\n"
-                    reply += f"{wine['reason']}\n"
+                    reply += f"- {wine['name']} ({wine['grape']} – {wine['region']})\n{wine['reason']}\n"
         else:
             reply = "No wine recommendations found for your dish."
     else:
@@ -212,5 +200,4 @@ def chat():
 # RUN
 # ===============================
 if __name__ == "__main__":
-    # Only for local testing; Render uses gunicorn
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
