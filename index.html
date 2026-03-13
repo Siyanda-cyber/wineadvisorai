@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wine Advisor AI – Meet Goofy 🍷</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    /* Base */
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {font-family:'Roboto', sans-serif; background: linear-gradient(135deg, #fdebd3, #f1c40f); color:#222; min-height:100vh; display:flex; flex-direction:column;}
+    a {text-decoration:none; color: inherit;}
+
+    /* Hero Section */
+    .hero {
+        flex:1;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        padding:80px 20px;
+        background: url('https://images.unsplash.com/photo-1579656592237-893f6c2c9f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyNjQ5MTR8MHwxfHNlYXJjaHwxfHx3aW5lfGVufDB8fHx8MTY5OTYyNTgxMg&ixlib=rb-4.0.3&q=80&w=1400') no-repeat center center/cover;
+        color:#fff;
+        position:relative;
+    }
+    .hero::after {
+        content:"";
+        position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.45);
+    }
+    .hero-content {
+        position:relative;
+        z-index:2;
+        max-width:700px;
+        animation: fadeIn 1.5s ease-out;
+    }
+    .hero h1 {
+        font-family:'Playfair Display', serif;
+        font-size:3rem;
+        margin-bottom:20px;
+    }
+    .hero p {
+        font-size:1.25rem;
+        line-height:1.6;
+        margin-bottom:30px;
+    }
+    .cta-btn {
+        background:#fff;
+        color:#900C3F;
+        padding:15px 35px;
+        font-weight:500;
+        border-radius:50px;
+        font-size:1rem;
+        transition:all 0.3s ease;
+        display:inline-block;
+    }
+    .cta-btn:hover {
+        background:#900C3F;
+        color:#fff;
+        transform:scale(1.05);
+    }
+
+    /* Fun Wine Glass */
+    .wine-glass {
+        display:inline-block;
+        font-size:2.5rem;
+        animation: float 2s infinite ease-in-out;
+    }
+    @keyframes float {
+        0%,100%{ transform: translateY(0);}
+        50%{ transform: translateY(-12px);}
+    }
+    @keyframes fadeIn {
+        from {opacity:0; transform: translateY(20px);}
+        to {opacity:1; transform: translateY(0);}
+    }
+
+    /* Chat Section */
+    #chat {padding:60px 20px; text-align:center; background:rgba(255,255,255,0.95);}
+    #chat h2 {font-family:'Playfair Display', serif; font-size:2rem; margin-bottom:10px; color:#900C3F;}
+    #chat p {margin-bottom:20px; font-size:1.1rem; color:#333;}
+    #dish-input {padding:12px 15px; width:250px; border-radius:8px; border:1px solid #ccc; font-size:1rem;}
+    #dish-btn {padding:12px 20px; margin-left:10px; background:#900C3F; color:#fff; border:none; border-radius:8px; cursor:pointer;}
+    #reply {margin-top:20px; font-weight:500; color:#222;}
+
+    /* Footer */
+    footer {text-align:center; padding:15px; background:#900C3F; color:#fff; font-size:0.9rem;}
+    
+    @media (max-width:768px){
+        .hero h1 {font-size:2.2rem;}
+        .hero p {font-size:1rem;}
+    }
+</style>
+</head>
+<body>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Wine Advisor AI 🍷</h1>
+        <p>
+                🇿🇦 South Africa – a land of unmatchable diversity and flavors! From the tables in <strong>kasi</strong> to tranquil beaches, the nation boasts a tapestry of food and wine unlike any other. 
+        Indulge in our <strong>pap</strong>, hearty <strong>stews</strong>, sizzling <strong>kota</strong>, or iconic <strong>bobotjie</strong> – each bite a story. 
+        Sip the world’s finest wines crafted in our globally acclaimed regions, and immerse yourself in the authentic South African culinary journey. 
+        <strong>Goofy 🍷</strong>, your all-knowing wine guide, speaks every language, knows every dish, and will match you with the perfect glass. 
+        <em>Be South African. Live the flavor. Celebrate the spirit. 🎉</em>
+        </p>
+        <a href="#chat" class="cta-btn">Chat with Goofy Now</a>
+        <div class="wine-glass">🍷</div>
+    </div>
+</section>
+
+<section id="chat">
+    <h2>Ask Goofy for Wine Pairings</h2>
+    <p>Type any South African dish below and let Goofy recommend the perfect wine.</p>
+    <input type="text" id="dish-input" placeholder="e.g., bobotie">
+    <button id="dish-btn" onclick="sendDish()">Get Pairing</button>
+    <div id="reply"></div>
+</section>
+
+<footer>
+    &copy; 2026 Wine Advisor AI | Chat with Goofy 🍷
+</footer>
+
+<script>
+async function sendDish() {
+    const dish = document.getElementById('dish-input').value.trim();
+    if(!dish) return;
+    const replyDiv = document.getElementById('reply');
+    replyDiv.textContent = 'Goofy is thinking... 🍷';
+    try {
+        const res = await fetch('/chat', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({message: dish})
+        });
+        const data = await res.json();
+        replyDiv.textContent = data.reply;
+    } catch(err) {
+        replyDiv.textContent = 'Oops! Goofy spilled the wine 🍷 Try again!';
+        console.error(err);
+    }
+}
+</script>
+
+</body>
+</html>
