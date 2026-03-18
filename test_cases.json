@@ -1,0 +1,17 @@
+[
+  {
+    "input": "wine with bobotie",
+    "expected": "Pinotage",
+    "notes": "Cape Malay sweet-spiced dish"
+  },
+  {
+    "input": "what goes with pap and wors",
+    "expected": "Chenin Blanc",
+    "notes": "braai + starch"
+  },
+  {
+    "input": "wine for snoek",
+    "expected": "Chenin Blanc",
+    "notes": "fish should not return red"
+  }
+]
