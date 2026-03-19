@@ -1,19 +1,35 @@
-import requests
+import os
 import json
+from app import bot
 
-URL = "http://127.0.0.1:5000/chat"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEST_FILE = os.path.join(BASE_DIR, "test_cases.json")
 
-with open("test_cases.json") as f:
-    tests = json.load(f)
+with open(TEST_FILE) as f:
+    test_cases = json.load(f)
 
-for test in tests:
-    res = requests.post(URL, json={"message": test["input"]})
-    reply = res.json()["reply"]
+rules = bot.load_rules()
 
-    passed = test["expected"].lower() in reply.lower()
+def simulate_chat(message):
+    return bot.find_dish(message, rules)
 
-    print("INPUT:", test["input"])
-    print("EXPECTED:", test["expected"])
-    print("BOT:", reply)
-    print("PASS" if passed else "FAIL")
-    print("-" * 40)
+passed = 0
+failed = 0
+
+for case in test_cases:
+    input_msg = case["input"]
+    expected = case["expected_dish"]
+
+    result = simulate_chat(input_msg)
+
+    if result == expected:
+        print(f"✅ PASS | {input_msg} → {result}")
+        passed += 1
+    else:
+        print(f"❌ FAIL | {input_msg}")
+        print(f"   Expected: {expected}, Got: {result}")
+        failed += 1
+
+print("\n====================")
+print(f"RESULT: {passed} passed, {failed} failed")
+print("====================")
