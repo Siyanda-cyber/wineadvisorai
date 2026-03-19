@@ -1,28 +1,52 @@
 from flask import Flask, request, render_template, jsonify
-import random
+import os
 import json
+import random
 import datetime
 
-app = Flask(__name__, template_folder="templates")
+# =====================
+# PATH SETUP
+# =====================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "..", "templates")
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
+
+RULES_FILE = os.path.join(BASE_DIR, "rules.json")
+LOG_FILE = os.path.join(BASE_DIR, "logs.json")
+FOODS_FILE = os.path.join(BASE_DIR, "foods.json")  # optional dataset
 
 # =====================
 # LOAD RULES
 # =====================
 def load_rules():
     try:
-        with open("rules.json") as f:
+        with open(RULES_FILE) as f:
+            return json.load(f)
+    except Exception as e:
+        print("Error loading rules:", e)
+        return {}
+
+# =====================
+# LOAD FOODS (OPTIONAL)
+# =====================
+def load_foods():
+    try:
+        with open(FOODS_FILE) as f:
             return json.load(f)
     except:
         return {}
-
-wine_pairs = load_rules()
 
 # =====================
 # LOGGING FUNCTION
 # =====================
 def log_interaction(user_input, bot_reply, status="matched"):
     try:
-        with open("logs.json", "r+") as f:
+        if not os.path.exists(LOG_FILE):
+            with open(LOG_FILE, "w") as f:
+                json.dump([], f)
+
+        with open(LOG_FILE, "r+") as f:
             data = json.load(f)
             data.append({
                 "input": user_input,
@@ -32,21 +56,17 @@ def log_interaction(user_input, bot_reply, status="matched"):
             })
             f.seek(0)
             json.dump(data, f, indent=2)
-    except:
-        # create file if it doesn't exist
-        with open("logs.json", "w") as f:
-            json.dump([], f)
+    except Exception as e:
+        print("Logging error:", e)
 
 # =====================
-# HELPER: FIND MATCH
+# FIND DISH FUNCTION
 # =====================
 def find_dish(message, rules):
     message = message.lower()
-
     for dish in rules:
         if dish in message:
             return dish
-
     return None
 
 # =====================
@@ -60,7 +80,7 @@ def get_intro():
     ])
 
 # =====================
-# LANDING PAGE
+# HOME ROUTE
 # =====================
 @app.route("/")
 def home():
@@ -71,44 +91,34 @@ def home():
 # =====================
 @app.route("/chat", methods=["POST"])
 def chat():
-
-    global wine_pairs
-    wine_pairs = load_rules()  # reload rules dynamically
-
+    rules = load_rules()
     data = request.json
-    message = data.get("message", "").lower()
+    message = data.get("message", "").strip().lower()
 
-    # find dish
-    dish = find_dish(message, wine_pairs)
+    dish = find_dish(message, rules)
 
     if dish:
-        wine = random.choice(wine_pairs[dish])
-
+        wine = random.choice(rules[dish])
         reply = (
             f"{get_intro()}\n\n"
             f"You're enjoying **{dish.title()}**!\n\n"
-            f"That dish pairs beautifully with:\n"
+            f"That pairs beautifully with:\n"
             f"👉 {wine} 🍷\n\n"
-            f"In South Africa we share food, laughter, and wine around the table 🇿🇦"
+            f"South African food + wine = magic 🇿🇦"
         )
-
         log_interaction(message, reply, "matched")
         return jsonify({"reply": reply})
 
-    # fallback (unknown dish)
-    fallback_reply = (
+    fallback = (
         "Goofy says: I’m still learning that dish 🍷\n\n"
-        "Try dishes like: pap, bobotie, stew or kota!"
+        "Try: pap, bobotie, stew or kota!"
     )
-
-    log_interaction(message, fallback_reply, "unknown")
-
-    return jsonify({"reply": fallback_reply})
-
+    log_interaction(message, fallback, "unknown")
+    return jsonify({"reply": fallback})
 
 # =====================
-# RUN LOCAL
+# RUN LOCAL OR RENDER
 # =====================
 if __name__ == "__main__":
-    app.run(debug=True)
-
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
