@@ -1,1 +1,6 @@
-
+{
+  "bobotie": ["Pinotage from Stellenbosch", "Shiraz from Paarl"],
+  "pap": ["Chenin Blanc from Stellenbosch"],
+  "kota": ["Bold Pinotage", "Spicy Shiraz"],
+  "stew": ["Cabernet Sauvignon", "Merlot"]
+}
