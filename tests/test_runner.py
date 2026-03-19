@@ -1,6 +1,6 @@
 import os
 import json
-from app import bot
+import bot
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_FILE = os.path.join(BASE_DIR, "test_cases.json")
