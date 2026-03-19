@@ -1,6 +1,25 @@
 {
-  "bobotie": ["Pinotage from Stellenbosch", "Shiraz from Paarl"],
-  "pap": ["Chenin Blanc from Stellenbosch"],
-  "kota": ["Bold Pinotage", "Spicy Shiraz"],
-  "stew": ["Cabernet Sauvignon", "Merlot"]
+  "fat_level": {
+    "high": ["Cabernet Sauvignon", "Shiraz", "Pinotage"],
+    "medium": ["Merlot", "Cinsault"],
+    "low": ["Sauvignon Blanc", "Chenin Blanc"]
+  },
+  "spice_level": {
+    "high": ["Riesling", "Gewurztraminer", "Chenin Blanc"],
+    "medium": ["Merlot", "Shiraz"],
+    "low": ["Cabernet Sauvignon", "Pinotage"]
+  },
+  "cooking_method": {
+    "grilled": ["Pinotage", "Shiraz"],
+    "fried": ["Sauvignon Blanc"],
+    "stewed": ["Merlot", "Shiraz"],
+    "baked": ["Chardonnay"]
+  },
+  "protein": {
+    "beef": ["Cabernet Sauvignon", "Merlot"],
+    "lamb": ["Shiraz"],
+    "chicken": ["Chenin Blanc"],
+    "fish": ["Sauvignon Blanc"],
+    "vegetarian": ["Chardonnay"]
+  }
 }
