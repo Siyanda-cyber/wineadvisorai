@@ -1,34 +1,67 @@
 from flask import Flask, request, render_template, jsonify
 import random
 import json
+import datetime
 
 app = Flask(__name__, template_folder="templates")
 
-# Simple wine suggestions
-wine_pairs = {
-    "bobotjie": [
-        "Pinotage from Stellenbosch 🍷",
-        "Shiraz from Paarl 🍷",
-        "Cape Blend from Franschhoek 🍷"
-    ],
-    "pap": [
-        "Chenin Blanc from Stellenbosch 🍷",
-        "Chardonnay from Constantia 🍷"
-    ],
-    "kota": [
-        "Bold Pinotage 🍷",
-        "Spicy Shiraz 🍷"
-    ],
-    "stew": [
-        "Cabernet Sauvignon 🍷",
-        "Merlot 🍷"
-    ]
-}
+# =====================
+# LOAD RULES
+# =====================
+def load_rules():
+    try:
+        with open("rules.json") as f:
+            return json.load(f)
+    except:
+        return {}
+
+wine_pairs = load_rules()
+
+# =====================
+# LOGGING FUNCTION
+# =====================
+def log_interaction(user_input, bot_reply, status="matched"):
+    try:
+        with open("logs.json", "r+") as f:
+            data = json.load(f)
+            data.append({
+                "input": user_input,
+                "reply": bot_reply,
+                "status": status,
+                "time": str(datetime.datetime.now())
+            })
+            f.seek(0)
+            json.dump(data, f, indent=2)
+    except:
+        # create file if it doesn't exist
+        with open("logs.json", "w") as f:
+            json.dump([], f)
+
+# =====================
+# HELPER: FIND MATCH
+# =====================
+def find_dish(message, rules):
+    message = message.lower()
+
+    for dish in rules:
+        if dish in message:
+            return dish
+
+    return None
+
+# =====================
+# GOOFY PERSONALITY
+# =====================
+def get_intro():
+    return random.choice([
+        "Goofy here! 🍷 Let’s talk South African food!",
+        "Ahh my friend! Goofy knows these flavors well 🍷",
+        "Now that is a proper South African meal! 🇿🇦",
+    ])
 
 # =====================
 # LANDING PAGE
 # =====================
-
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -36,47 +69,45 @@ def home():
 # =====================
 # CHAT ENDPOINT
 # =====================
-
 @app.route("/chat", methods=["POST"])
 def chat():
 
+    global wine_pairs
+    wine_pairs = load_rules()  # reload rules dynamically
+
     data = request.json
-    message = data.get("message","").lower()
+    message = data.get("message", "").lower()
 
-    # Goofy personality responses
-    goofy_intro = [
-        "Goofy here! 🍷 Let’s talk South African food!",
-        "Ahh my friend! Goofy knows these flavors well 🍷",
-        "Now that is a proper South African meal! 🇿🇦",
-    ]
+    # find dish
+    dish = find_dish(message, wine_pairs)
 
-    # detect dish
-    for dish in wine_pairs:
+    if dish:
+        wine = random.choice(wine_pairs[dish])
 
-        if dish in message:
+        reply = (
+            f"{get_intro()}\n\n"
+            f"You're enjoying **{dish.title()}**!\n\n"
+            f"That dish pairs beautifully with:\n"
+            f"👉 {wine} 🍷\n\n"
+            f"In South Africa we share food, laughter, and wine around the table 🇿🇦"
+        )
 
-            wine = random.choice(wine_pairs[dish])
+        log_interaction(message, reply, "matched")
+        return jsonify({"reply": reply})
 
-            reply = (
-                f"{random.choice(goofy_intro)}\n\n"
-                f"You're enjoying **{dish.title()}**!\n\n"
-                f"That dish loves a glass of:\n"
-                f"👉 {wine}\n\n"
-                f"In South Africa we share food, laughter, and wine around the table 🍷"
-            )
+    # fallback (unknown dish)
+    fallback_reply = (
+        "Goofy says: I’m still learning that dish 🍷\n\n"
+        "Try dishes like: pap, bobotie, stew or kota!"
+    )
 
-            return jsonify({"reply": reply})
+    log_interaction(message, fallback_reply, "unknown")
 
-    # fallback
-    return jsonify({
-        "reply":
-        "Goofy says: Tell me what South African food you're eating!\n\nTry: pap, bobotjie, stew or kota 🍷"
-    })
+    return jsonify({"reply": fallback_reply})
 
 
 # =====================
 # RUN LOCAL
 # =====================
-
 if __name__ == "__main__":
     app.run(debug=True)
