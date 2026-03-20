@@ -1,35 +1,33 @@
-import os
+import requests
 import json
-import bot
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEST_FILE = os.path.join(BASE_DIR, "test_cases.json")
+URL = "http://127.0.0.1:5000/chat"
 
-with open(TEST_FILE) as f:
-    test_cases = json.load(f)
+with open("test_cases.json") as f:
+    tests = json.load(f)
 
-rules = bot.load_rules()
+passed_count = 0
 
-def simulate_chat(message):
-    return bot.find_dish(message, rules)
+for test in tests:
 
-passed = 0
-failed = 0
+    # ✅ THIS MUST COME FIRST
+    res = requests.post(URL, json={"message": test["input"]})
 
-for case in test_cases:
-    input_msg = case["input"]
-    expected = case["expected_dish"]
+    # ✅ DEBUG PRINT (AFTER res exists)
+    print("RAW RESPONSE:", res.json())
 
-    result = simulate_chat(input_msg)
+    reply = res.json()["reply"]
 
-    if result == expected:
-        print(f"✅ PASS | {input_msg} → {result}")
-        passed += 1
-    else:
-        print(f"❌ FAIL | {input_msg}")
-        print(f"   Expected: {expected}, Got: {result}")
-        failed += 1
+    passed = test["expected"].lower() in reply.lower()
 
-print("\n====================")
-print(f"RESULT: {passed} passed, {failed} failed")
-print("====================")
+    if passed:
+        passed_count += 1
+
+    print("INPUT:", test["input"])
+    print("EXPECTED:", test["expected"])
+    print("BOT:", reply)
+    print("PASS" if passed else "FAIL")
+    print("-" * 40)
+
+accuracy = (passed_count / len(tests)) * 100
+print(f"\nACCURACY: {accuracy:.2f}%")
