@@ -1,25 +1,44 @@
 {
-  "fat_level": {
-    "high": ["Cabernet Sauvignon", "Shiraz", "Pinotage"],
-    "medium": ["Merlot", "Cinsault"],
-    "low": ["Sauvignon Blanc", "Chenin Blanc"]
-  },
-  "spice_level": {
-    "high": ["Riesling", "Gewurztraminer", "Chenin Blanc"],
-    "medium": ["Merlot", "Shiraz"],
-    "low": ["Cabernet Sauvignon", "Pinotage"]
-  },
-  "cooking_method": {
-    "grilled": ["Pinotage", "Shiraz"],
-    "fried": ["Sauvignon Blanc"],
-    "stewed": ["Merlot", "Shiraz"],
-    "baked": ["Chardonnay"]
-  },
-  "protein": {
-    "beef": ["Cabernet Sauvignon", "Merlot"],
-    "lamb": ["Shiraz"],
-    "chicken": ["Chenin Blanc"],
-    "fish": ["Sauvignon Blanc"],
-    "vegetarian": ["Chardonnay"]
-  }
+  "boerewors": ["Pinotage"],
+  "shisa nyama meat": ["Cabernet Sauvignon"],
+  "chicken dust": ["Chenin Blanc"],
+  "oxtail potjie": ["Cabernet Sauvignon"],
+  "umngqusho": ["Riesling"],
+  "sosaties": ["Chenin Blanc"],
+  "amagwinya": ["Moscato"],
+  "vetkoek": ["Chenin Blanc"],
+  "mogodu": ["Cabernet Sauvignon"],
+  "bogobe": ["Riesling"],
+  "potjiekos": ["Cabernet Sauvignon"],
+  "seswaa": ["Pinotage"],
+  "snoek braai": ["Chenin Blanc"],
+  "braaibroodjie": ["Chardonnay"],
+  "umleqwa": ["Riesling"],
+  "biltong": ["Shiraz"],
+  "walkie talkies": ["Riesling"],
+  "durban curry": ["Riesling"],
+  "amanqina": ["Chenin Blanc"],
+  "isijingi": ["Riesling"],
+  "biryani": ["Riesling"],
+  "tripe curry": ["Cabernet Sauvignon"],
+  "mageu": ["Moscato"],
+  "malva pudding": ["Moscato"],
+  "vetkoek & mince": ["Cabernet Sauvignon"],
+  "droewors": ["Cabernet Sauvignon"],
+  "pickled fish": ["Sauvignon Blanc"],
+  "samp & beans": ["Riesling"],
+  "umvubo": ["Moscato"],
+  "skop": ["Cabernet Sauvignon"],
+  "amagwinya and mashed potatoes": ["Moscato"],
+  "pap and stew": ["Cabernet Sauvignon"],
+  "hertzoggies": ["Moscato"],
+  "mopane worms": ["Shiraz"],
+  "bunny chow": ["Cabernet Sauvignon"],
+  "morogo": ["Riesling"],
+  "chakalaka": ["Riesling"],
+  "bobotie": ["Pinotage"],
+  "melktert": ["Moscato"],
+  "kota": ["Chenin Blanc"],
+  "koeksisters": ["Moscato"],
+  "ting": ["Moscato"]
 }
