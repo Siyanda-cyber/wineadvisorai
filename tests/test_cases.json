@@ -1,17 +1,44 @@
-[
-  {
-    "input": "wine with bobotie",
-    "expected": "Pinotage",
-    "notes": "Cape Malay sweet-spiced dish"
-  },
-  {
-    "input": "what goes with pap and wors",
-    "expected": "Chenin Blanc",
-    "notes": "braai + starch"
-  },
-  {
-    "input": "wine for snoek",
-    "expected": "Chenin Blanc",
-    "notes": "fish should not return red"
-  }
+test_cases = [
+    {"input": "boerewors", "expected": "Pinotage"},
+    {"input": "shisa nyama meat", "expected": "Cabernet Sauvignon"},
+    {"input": "chicken dust", "expected": "Chenin Blanc"},
+    {"input": "oxtail potjie", "expected": "Cabernet Sauvignon"},
+    {"input": "umngqusho", "expected": "Riesling"},
+    {"input": "sosaties", "expected": "Chenin Blanc"},
+    {"input": "amagwinya", "expected": "Moscato"},
+    {"input": "vetkoek", "expected": "Chenin Blanc"},
+    {"input": "mogodu", "expected": "Cabernet Sauvignon"},
+    {"input": "bogobe", "expected": "Riesling"},
+    {"input": "potjiekos", "expected": "Cabernet Sauvignon"},
+    {"input": "seswaa", "expected": "Pinotage"},
+    {"input": "snoek braai", "expected": "Chenin Blanc"},
+    {"input": "braaibroodjie", "expected": "Chardonnay"},
+    {"input": "umleqwa", "expected": "Riesling"},
+    {"input": "biltong", "expected": "Shiraz"},
+    {"input": "walkie talkies", "expected": "Riesling"},
+    {"input": "durban curry", "expected": "Riesling"},
+    {"input": "amanqina", "expected": "Chenin Blanc"},
+    {"input": "isijingi", "expected": "Riesling"},
+    {"input": "biryani", "expected": "Riesling"},
+    {"input": "tripe curry", "expected": "Cabernet Sauvignon"},
+    {"input": "mageu", "expected": "Moscato"},
+    {"input": "malva pudding", "expected": "Moscato"},
+    {"input": "vetkoek & mince", "expected": "Cabernet Sauvignon"},
+    {"input": "droewors", "expected": "Cabernet Sauvignon"},
+    {"input": "pickled fish", "expected": "Sauvignon Blanc"},
+    {"input": "samp & beans", "expected": "Riesling"},
+    {"input": "umvubo", "expected": "Moscato"},
+    {"input": "skop", "expected": "Cabernet Sauvignon"},
+    {"input": "amagwinya and mashed potatoes", "expected": "Moscato"},
+    {"input": "pap and stew", "expected": "Cabernet Sauvignon"},
+    {"input": "hertzoggies", "expected": "Moscato"},
+    {"input": "mopane worms", "expected": "Shiraz"},
+    {"input": "bunny chow", "expected": "Cabernet Sauvignon"},
+    {"input": "morogo", "expected": "Riesling"},
+    {"input": "chakalaka", "expected": "Riesling"},
+    {"input": "bobotie", "expected": "Pinotage"},
+    {"input": "melktert", "expected": "Moscato"},
+    {"input": "kota", "expected": "Chenin Blanc"},
+    {"input": "koeksisters", "expected": "Moscato"},
+    {"input": "ting", "expected": "Moscato"}
 ]
