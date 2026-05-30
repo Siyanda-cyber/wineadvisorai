@@ -11,7 +11,7 @@
   "bogobe": ["Riesling"],
   "potjiekos": ["Cabernet Sauvignon"],
   "seswaa": ["Pinotage"],
-  "snoek braai": ["Chenin Blanc"],
+  "snoek": ["Chenin Blanc"],
   "braaibroodjie": ["Chardonnay"],
   "umleqwa": ["Riesling"],
   "biltong": ["Shiraz"],
@@ -23,14 +23,13 @@
   "tripe curry": ["Cabernet Sauvignon"],
   "mageu": ["Moscato"],
   "malva pudding": ["Moscato"],
-  "vetkoek & mince": ["Cabernet Sauvignon"],
   "droewors": ["Cabernet Sauvignon"],
   "pickled fish": ["Sauvignon Blanc"],
   "samp & beans": ["Riesling"],
   "umvubo": ["Moscato"],
   "skop": ["Cabernet Sauvignon"],
   "amagwinya and mashed potatoes": ["Moscato"],
-  "pap and stew": ["Cabernet Sauvignon"],
+  "pap": ["Cabernet Sauvignon"],
   "hertzoggies": ["Moscato"],
   "mopane worms": ["Shiraz"],
   "bunny chow": ["Cabernet Sauvignon"],
@@ -40,5 +39,7 @@
   "melktert": ["Moscato"],
   "kota": ["Chenin Blanc"],
   "koeksisters": ["Moscato"],
-  "ting": ["Moscato"]
+  "ting": ["Moscato"],
+  "beef stew": ["Cabernet Sauvignon"],
+  "fried chicken": ["Chardonnay"]
 }
